@@ -28,23 +28,22 @@
      <div class="form_row sd">
       <p class="form_text sd">タイトル：</p>
       <div class="form_item">
-       <input type="text" name="title" class="item">
+       <input type="text" th:field="${tasksForm.title}" class="item" required>
       </div>
      </div>
      <div class="form_row sd">
       <p class="form_text sd">日付：</p>
       <div class="form_item">
-       <input type="date" name="date"
-        th:value="${#temporals.format(date, 'yyyy-MM-dd')}" class="item">
+       <input type="date" th:field="${tasksForm.date}" class="item" required>
       </div>
      </div>
      <div class="form_row sd">
       <p class="form_text sd">内容:</p>
       <div class="form_item">
-       <textarea name="text" cols="80" rows="10" class="item"></textarea>
+       <textarea th:field="${tasksForm.text}" cols="80" rows="10" class="item" required></textarea>
       </div>
      </div>
-     <button class="form_button sd">
+     <button type="submit" class="form_button sd">
       <p class="form_button_text sd text">投稿</p>
      </button>
     </form>
