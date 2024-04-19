@@ -24,7 +24,7 @@ public class TodoController {
 		
 		return "create";
 	}
-	@PostMapping("/main/create")
+	@PostMapping("/create")
 	public String createTask(TasksForm tasksForm) {
         Tasks tasks = new Tasks();
         tasks.setDate(tasksForm.getDate());
