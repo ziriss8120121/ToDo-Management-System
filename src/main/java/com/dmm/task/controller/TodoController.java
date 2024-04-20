@@ -16,7 +16,7 @@ public class TodoController {
 	
 	@Autowired
 	private TasksRepository tasksRepository;
-	@GetMapping("/testcreate")
+	@GetMapping("/create")
 	public String NewTasks(Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
@@ -36,17 +36,17 @@ public class TodoController {
     }
 
 
-	@RequestMapping("/testedit")
+	@RequestMapping("/edit")
 	public String test() {
 		return "edit";
 	}
 
-	@RequestMapping("/testmain")
+	@GetMapping("/main")
 	public String main() {
 		return "main";
 	}
 
-	@RequestMapping("/testlogin")
+	@RequestMapping("/login")
 	public String login() {
 		return "login";
 	}
