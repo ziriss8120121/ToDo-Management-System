@@ -1,5 +1,12 @@
 package com.dmm.task.controller;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +23,7 @@ public class TodoController {
 	
 	@Autowired
 	private TasksRepository tasksRepository;
-	@GetMapping("/create")
+	@GetMapping("/main/create")
 	public String NewTasks(Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
@@ -42,10 +49,50 @@ public class TodoController {
 	}
 
 	@GetMapping("/main")
-	public String main() {
-		return "main";
-	}
+	public String main(Model model) {
+    //2次元リスト
+    List<List<LocalDate>> calendarMatrix = new ArrayList<>();
+    //当月の初日の日付
+    LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+    //当月の日数
+    int daysInMonth = firstDayOfMonth.lengthOfMonth();
+    //最初の曜日
+    DayOfWeek firstDayOfWeek = firstDayOfMonth.getDayOfWeek();
+    //1週間分の日付
+    List<LocalDate> weekDates = new ArrayList<>();
+    //前月分の日付
+    LocalDate prevMonthDate = firstDayOfMonth.minusDays(firstDayOfWeek.getValue() % 7);
+    for (int i = 0; i < firstDayOfWeek.getValue() % 7; i++) {
+        weekDates.add(prevMonthDate.plusDays(i));
+    }
+    //当月の日付
+    for (int i = 1; i <= daysInMonth; i++) {
+        LocalDate currentDate = firstDayOfMonth.withDayOfMonth(i);
+        weekDates.add(currentDate);
+        if (weekDates.size() == 7) {
+            calendarMatrix.add(new ArrayList<>(weekDates));
+            weekDates.clear();
+        }
+    }
+    LocalDate nextMonthDate = firstDayOfMonth.plusMonths(1).withDayOfMonth(1);
+    DayOfWeek lastDayOfWeek = nextMonthDate.minusDays(1).getDayOfWeek();
+    for (int i = 0; i < (7 - lastDayOfWeek.getValue() % 7) % 7; i++) {
+        weekDates.add(nextMonthDate.plusDays(i));
+    }
+    calendarMatrix.add(new ArrayList<>(weekDates));
+    
+    model.addAttribute("matrix", calendarMatrix);
+    model.addAttribute("month", firstDayOfMonth.getMonth());
+    
+ // 仮のタスクリストを追加
+    Map<LocalDate, List<Tasks>> tasks = new HashMap<>();
+    model.addAttribute("tasks", tasks);  // tasksをモデルに追加する
+     return "main";
+    }
 
+    
+
+  
 	@RequestMapping("/login")
 	public String login() {
 		return "login";
