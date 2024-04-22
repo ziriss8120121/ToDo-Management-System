@@ -1,6 +1,6 @@
 package com.dmm.task.form;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ public class TasksForm {
 	
 	private String text;
 	
-	private LocalDate date;
+	private LocalDateTime date;
 	
 	private boolean done;
 

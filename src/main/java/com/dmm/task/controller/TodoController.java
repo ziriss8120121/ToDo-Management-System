@@ -2,6 +2,7 @@ package com.dmm.task.controller;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ public class TodoController {
 	@Autowired
 	private TasksRepository tasksRepository;
 	@GetMapping("/main/create/{date}")
-	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, Model model) {
+	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime date, Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
 		tasksForm.setDate(date);
@@ -89,7 +90,7 @@ public class TodoController {
     model.addAttribute("month", firstDayOfMonth.getMonth());
     
  // 仮のタスクリストを追加
-    Map<LocalDate, List<Tasks>> tasks = new HashMap<>();
+    Map<LocalDateTime, List<Tasks>> tasks = new HashMap<>();
     model.addAttribute("tasks", tasks);  // tasksをモデルに追加する
      return "main";
     }
