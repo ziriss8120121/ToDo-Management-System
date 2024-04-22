@@ -19,6 +19,8 @@ public class Tasks {
 	
 	private Long id;
 	
+	private String name;
+	
 	private String title;
 	
 	private String text;

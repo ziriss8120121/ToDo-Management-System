@@ -3,6 +3,7 @@ package com.dmm.task.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +30,7 @@ public class TodoController {
 	@Autowired
 	private TasksRepository tasksRepository;
 	@GetMapping("/main/create/{date}")
-	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime date, Model model) {
+	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
 		tasksForm.setDate(date);
@@ -37,13 +40,17 @@ public class TodoController {
 		return "create";
 	}
 	@PostMapping("main/create")
-	public String createTask(TasksForm tasksForm) {
+	public String createTask(@AuthenticationPrincipal UserDetails userDetails, @DateTimeFormat(pattern = "yyyy-MM-dd") TasksForm tasksForm, Model model) {
         Tasks tasks = new Tasks();
-        tasks.setDate(tasksForm.getDate());
+        tasks.setName(userDetails.getUsername());
+        LocalDateTime dateTime = tasksForm.getDate().atTime(LocalTime.MIN);
+        tasks.setDate(dateTime); 
         tasks.setText(tasksForm.getText());
         tasks.setDone(true);
+        model.addAttribute("tasks", tasks);
         tasks.setTitle(tasksForm.getTitle());
         tasksRepository.save(tasks);
+        
         return "redirect:/main"; // タスク作成後はメインページにリダイレクトする
     }
 
