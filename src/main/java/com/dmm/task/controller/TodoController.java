@@ -25,13 +25,11 @@ public class TodoController {
 	
 	@Autowired
 	private TasksRepository tasksRepository;
-	@GetMapping("/main/creat/{date}")
+	@GetMapping("/main/create/{date}")
 	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
-		tasksForm.setTitle("");
 		tasksForm.setDate(date);
-		tasksForm.setText(""); 
 		
 		model.addAttribute("tasksForm",tasksForm);
 		
