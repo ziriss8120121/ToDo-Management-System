@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,15 +25,19 @@ public class TodoController {
 	
 	@Autowired
 	private TasksRepository tasksRepository;
-	@GetMapping("/main/create")
-	public String NewTasks(Model model) {
+	@GetMapping("/main/creat/{date}")
+	public String NewTasks(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, Model model) {
 		
 		TasksForm tasksForm = new TasksForm();
+		tasksForm.setTitle("");
+		tasksForm.setDate(date);
+		tasksForm.setText(""); 
+		
 		model.addAttribute("tasksForm",tasksForm);
 		
 		return "create";
 	}
-	@PostMapping("/create")
+	@PostMapping("main/create")
 	public String createTask(TasksForm tasksForm) {
         Tasks tasks = new Tasks();
         tasks.setDate(tasksForm.getDate());
@@ -76,7 +82,7 @@ public class TodoController {
     }
     LocalDate nextMonthDate = firstDayOfMonth.plusMonths(1).withDayOfMonth(1);
     DayOfWeek lastDayOfWeek = nextMonthDate.minusDays(1).getDayOfWeek();
-    for (int i = 0; i < (7 - lastDayOfWeek.getValue() % 7) % 7; i++) {
+    for (int i = 0; i < (6 - lastDayOfWeek.getValue() % 7) % 7; i++) {
         weekDates.add(nextMonthDate.plusDays(i));
     }
     calendarMatrix.add(new ArrayList<>(weekDates));
