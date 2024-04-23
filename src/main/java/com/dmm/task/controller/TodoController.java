@@ -5,9 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -97,8 +95,9 @@ public class TodoController {
     model.addAttribute("month", firstDayOfMonth.getMonth());
     
  // 仮のタスクリストを追加
-    Map<LocalDateTime, List<Tasks>> tasks = new HashMap<>();
-    model.addAttribute("tasks", tasks);  // tasksをモデルに追加する
+    List<Tasks> tasksList = tasksRepository.findAll();
+    model.addAttribute("tasks", tasksList);
+
      return "main";
     }
 
