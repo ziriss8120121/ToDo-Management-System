@@ -40,14 +40,13 @@ public class TodoController {
 		return "create";
 	}
 	@PostMapping("main/create")
-	public String createTask(@AuthenticationPrincipal UserDetails userDetails, @DateTimeFormat(pattern = "yyyy-MM-dd") TasksForm tasksForm, Model model) {
+	public String createTask(@AuthenticationPrincipal UserDetails userDetails, @DateTimeFormat(pattern = "yyyy-MM-dd") TasksForm tasksForm) {
         Tasks tasks = new Tasks();
         tasks.setName(userDetails.getUsername());
         LocalDateTime dateTime = tasksForm.getDate().atTime(LocalTime.MIN);
         tasks.setDate(dateTime); 
         tasks.setText(tasksForm.getText());
         tasks.setDone(true);
-        model.addAttribute("tasks", tasks);
         tasks.setTitle(tasksForm.getTitle());
         tasksRepository.save(tasks);
         
@@ -64,6 +63,18 @@ public class TodoController {
 		
 		return "edit";
 	}
+	
+	@PostMapping("/main/edit/{id}")
+	public String updateTask(@PathVariable Long id, @DateTimeFormat(pattern = "yyyy-MM-dd") TasksForm tasksForm) {
+		Tasks task = tasksRepository.findById(id).orElse(null);
+		task.setTitle(tasksForm.getTitle());
+        task.setText(tasksForm.getText());
+        LocalDateTime dateTime = tasksForm.getDate().atTime(LocalTime.MIN);
+        task.setDate(dateTime); 
+        tasksRepository.save(task);
+		return "redirect:/main"; 
+	}
+  
 
 	@GetMapping("/main")
 	public String main(Model model) {
@@ -112,15 +123,15 @@ public class TodoController {
      return "main";
     }
 
-	@PostMapping("/users/delete/{id}")
+	@PostMapping("/main/delete/{id}")
 	// 処理の中でidを使えるように、引数にidを追加
 	public String deleteTask(@PathVariable Long id) {
 		// 指定したIDのユーザーを削除
 		tasksRepository.deleteById(id);
 		return "redirect:/main";
 	}
-
-  
+    
+	
 	@RequestMapping("/login")
 	public String login() {
 		return "login";
