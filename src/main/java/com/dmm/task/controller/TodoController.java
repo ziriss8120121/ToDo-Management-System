@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,8 +55,13 @@ public class TodoController {
     }
 
 
-	@RequestMapping("/edit")
-	public String test() {
+	@GetMapping("main/edit/{id}")
+	public String editTask(@PathVariable Long id, Model model) {
+	
+    Tasks task = tasksRepository.findById(id).orElse(null);
+    
+    model.addAttribute("task", task);
+		
 		return "edit";
 	}
 
@@ -95,13 +102,23 @@ public class TodoController {
     model.addAttribute("month", firstDayOfMonth.getMonth());
     
  // 仮のタスクリストを追加
-    List<Tasks> tasksList = tasksRepository.findAll();
-    model.addAttribute("tasks", tasksList);
-
+    List<Tasks> list = tasksRepository.findAll();
+    MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
+    for (Tasks task : list) {
+        LocalDate date = task.getDate().toLocalDate();
+        tasks.add(date, task);
+    }
+    model.addAttribute("tasks", tasks);  // tasksをモデルに追加する
      return "main";
     }
 
-    
+	@PostMapping("/users/delete/{id}")
+	// 処理の中でidを使えるように、引数にidを追加
+	public String deleteTask(@PathVariable Long id) {
+		// 指定したIDのユーザーを削除
+		tasksRepository.deleteById(id);
+		return "redirect:/main";
+	}
 
   
 	@RequestMapping("/login")
