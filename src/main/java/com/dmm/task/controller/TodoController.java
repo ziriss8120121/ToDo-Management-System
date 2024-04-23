@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -77,7 +78,8 @@ public class TodoController {
   
 
 	@GetMapping("/main")
-	public String main(Model model) {
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+	public String main(Model model, @AuthenticationPrincipal UserDetails userDetails ) {
     //2次元リスト
     List<List<LocalDate>> calendarMatrix = new ArrayList<>();
     //当月の初日の日付
@@ -112,8 +114,15 @@ public class TodoController {
     model.addAttribute("matrix", calendarMatrix);
     model.addAttribute("month", firstDayOfMonth.getMonth());
     
- // 仮のタスクリストを追加
-    List<Tasks> list = tasksRepository.findAll();
+ 
+    List<Tasks> list;
+    if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        list = tasksRepository.findAll(); // 管理者の場合は全てのタスクを取得
+    } else {
+        // 一般ユーザーの場合は自分のタスクのみ取得
+        list = tasksRepository.findAllByName(userDetails.getUsername());
+    }
+    
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
     for (Tasks task : list) {
         LocalDate date = task.getDate().toLocalDate();

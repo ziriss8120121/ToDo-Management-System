@@ -17,6 +17,6 @@ public interface TasksRepository extends JpaRepository<Tasks, Long> {
     List<Tasks> findByDateBetweenAndName(@Param("from") LocalDateTime from,
                                          @Param("to") LocalDateTime to,
                                          @Param("name") String name);	
-	
+	List<Tasks> findAllByName(String name);
 	
 }
