@@ -126,7 +126,7 @@ public class TodoController {
         String username = userDetails.getUsername();
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
         LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
-        list = tasksRepository.findByDateBetweenAndName(endOfMonth, startOfMonth, username);
+        list = tasksRepository.findByDateBetweenAndName(startOfMonth, endOfMonth, username);
     } 
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
     for (Tasks task : list) {
