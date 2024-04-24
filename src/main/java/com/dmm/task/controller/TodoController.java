@@ -121,7 +121,7 @@ public class TodoController {
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
         LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
         list = tasksRepository.findAllTasksForMonth(startOfMonth, endOfMonth);
-    } else if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+    } else  {
         // 一般ユーザーの場合は自分の当月のタスクのみを取得
         String username = userDetails.getUsername();
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
