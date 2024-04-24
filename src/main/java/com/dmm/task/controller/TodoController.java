@@ -47,7 +47,7 @@ public class TodoController {
         LocalDateTime dateTime = tasksForm.getDate().atTime(LocalTime.MIN);
         tasks.setDate(dateTime); 
         tasks.setText(tasksForm.getText());
-        tasks.setDone(true);
+        tasks.setDone(false);
         tasks.setTitle(tasksForm.getTitle());
         tasksRepository.save(tasks);
         
@@ -70,6 +70,7 @@ public class TodoController {
 		Tasks task = tasksRepository.findById(id).orElse(null);
 		task.setTitle(tasksForm.getTitle());
         task.setText(tasksForm.getText());
+        task.setDone(tasksForm.isDone());
         LocalDateTime dateTime = tasksForm.getDate().atTime(LocalTime.MIN);
         task.setDate(dateTime); 
         tasksRepository.save(task);
