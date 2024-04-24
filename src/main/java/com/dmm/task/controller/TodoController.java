@@ -117,12 +117,17 @@ public class TodoController {
  
     List<Tasks> list;
     if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-        list = tasksRepository.findAll(); // 管理者の場合は全てのタスクを取得
-    } else {
-        // 一般ユーザーの場合は自分のタスクのみ取得
-        list = tasksRepository.findAllByName(userDetails.getUsername());
-    }
-    
+        // 管理者の場合はすべてのユーザーの当月のタスクを取得
+        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
+        LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
+        list = tasksRepository.findAllTasksForMonth(startOfMonth, endOfMonth);
+    } else if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+        // 一般ユーザーの場合は自分の当月のタスクのみを取得
+        String username = userDetails.getUsername();
+        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
+        LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
+        list = tasksRepository.findByDateBetweenAndName(endOfMonth, startOfMonth, username);
+    } 
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
     for (Tasks task : list) {
         LocalDate date = task.getDate().toLocalDate();
