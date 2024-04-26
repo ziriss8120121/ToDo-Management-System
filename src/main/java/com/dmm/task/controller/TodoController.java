@@ -4,8 +4,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,11 +82,37 @@ public class TodoController {
 
 	@GetMapping("/main")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-	public String main(Model model, @AuthenticationPrincipal UserDetails userDetails ) {
-    //2次元リスト
+	public String main(Model model, 
+			           @AuthenticationPrincipal UserDetails userDetails,
+			           @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+   
+    
+	System.out.println(date);//デバッグ
+		//2次元リスト
     List<List<LocalDate>> calendarMatrix = new ArrayList<>();
     //当月の初日の日付
-    LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+    LocalDate firstDayOfMonth;
+    if (date == null) {
+    	firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+    } else {
+    	firstDayOfMonth = date;
+    
+    }
+    
+    //先月の初日の日付を計算（prev）
+    LocalDate prevMonth = firstDayOfMonth.minusMonths(1).withDayOfMonth(1);
+
+    // 来月の初日の日付を計算（next）
+    LocalDate nextMonth = firstDayOfMonth.plusMonths(1).withDayOfMonth(1);
+ // 月の日本語表記を取得する
+    String japaneseMonth = firstDayOfMonth.getMonth().getDisplayName(
+        TextStyle.FULL_STANDALONE,
+        Locale.JAPAN
+    );
+    
+    int year = firstDayOfMonth.getYear();
+    
+    String yearAndMonth = year + "年" + japaneseMonth;
     //当月の日数
     int daysInMonth = firstDayOfMonth.lengthOfMonth();
     //最初の曜日
@@ -113,7 +141,10 @@ public class TodoController {
     calendarMatrix.add(new ArrayList<>(weekDates));
     
     model.addAttribute("matrix", calendarMatrix);
-    model.addAttribute("month", firstDayOfMonth.getMonth());
+    model.addAttribute("month", yearAndMonth);
+    model.addAttribute("prev", prevMonth);
+    model.addAttribute("next", nextMonth);
+    
     
  
     List<Tasks> list;
@@ -131,8 +162,8 @@ public class TodoController {
     } 
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
     for (Tasks task : list) {
-        LocalDate date = task.getDate().toLocalDate();
-        tasks.add(date, task);
+        LocalDate dates = task.getDate().toLocalDate();
+        tasks.add(dates, task);
     }
     model.addAttribute("tasks", tasks);  // tasksをモデルに追加する
      return "main";
