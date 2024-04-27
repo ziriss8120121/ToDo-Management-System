@@ -150,14 +150,14 @@ public class TodoController {
     List<Tasks> list;
     if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
         // 管理者の場合はすべてのユーザーの当月のタスクを取得
-        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
-        LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
+    	LocalDateTime startOfMonth = prevMonthDate.atStartOfDay();
+        LocalDateTime endOfMonth = nextMonthDate.atStartOfDay();
         list = tasksRepository.findAllTasksForMonth(startOfMonth, endOfMonth);
     } else  {
         // 一般ユーザーの場合は自分の当月のタスクのみを取得
         String username = userDetails.getUsername();
-        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
-        LocalDateTime endOfMonth = firstDayOfMonth.plusMonths(1).atStartOfDay().minusSeconds(1);
+        LocalDateTime startOfMonth = prevMonthDate.atStartOfDay();
+        LocalDateTime endOfMonth = nextMonthDate.atStartOfDay();
         list = tasksRepository.findByDateBetweenAndName(startOfMonth, endOfMonth, username);
     } 
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
