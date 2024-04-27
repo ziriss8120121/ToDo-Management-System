@@ -133,12 +133,16 @@ public class TodoController {
             weekDates.clear();
         }
     }
+    //来月分の日付
     LocalDate nextMonthDate = firstDayOfMonth.plusMonths(1).withDayOfMonth(1);
     DayOfWeek lastDayOfWeek = nextMonthDate.minusDays(1).getDayOfWeek();
     for (int i = 0; i < (6 - lastDayOfWeek.getValue() % 7) % 7; i++) {
         weekDates.add(nextMonthDate.plusDays(i));
     }
     calendarMatrix.add(new ArrayList<>(weekDates));
+    
+    System.out.println("★★=prevMonthDate" + prevMonthDate);
+    System.out.println("★★nextMonthDate=" + nextMonthDate);//デバッグ
     
     model.addAttribute("matrix", calendarMatrix);
     model.addAttribute("month", yearAndMonth);
@@ -151,13 +155,17 @@ public class TodoController {
     if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
         // 管理者の場合はすべてのユーザーの当月のタスクを取得
     	LocalDateTime startOfMonth = prevMonthDate.atStartOfDay();
-        LocalDateTime endOfMonth = nextMonthDate.atStartOfDay();
+        LocalDateTime endOfMonth = nextMonthDate.plusDays((6 - lastDayOfWeek.getValue() % 7) - 1 ).atStartOfDay();
+        System.out.println("★★startOfMonth=" + startOfMonth);
+        System.out.println("★★endOfMonth=" + endOfMonth);
         list = tasksRepository.findAllTasksForMonth(startOfMonth, endOfMonth);
     } else  {
         // 一般ユーザーの場合は自分の当月のタスクのみを取得
         String username = userDetails.getUsername();
         LocalDateTime startOfMonth = prevMonthDate.atStartOfDay();
-        LocalDateTime endOfMonth = nextMonthDate.atStartOfDay();
+        LocalDateTime endOfMonth = nextMonthDate.plusDays(6 - lastDayOfWeek.getValue() % 7).atStartOfDay();
+        System.out.println("★★startOfMonth=" + startOfMonth);
+        System.out.println("★★endOfMonth=" + endOfMonth);
         list = tasksRepository.findByDateBetweenAndName(startOfMonth, endOfMonth, username);
     } 
     MultiValueMap<LocalDate, Tasks> tasks = new LinkedMultiValueMap<LocalDate, Tasks>();
